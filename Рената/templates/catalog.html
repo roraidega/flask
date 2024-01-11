@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="btn-group mb-3" role="group" aria-label="Basic example">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <h5>{{ message }}</h5>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <a href="{{ url_for('catalog') }}" class="btn btn-secondary">Все товары</a>
+        <a href="{{ url_for('catalog', category='Блузки') }}" class="btn btn-secondary">Блузки</a>
+        <a href="{{ url_for('catalog', category='Брюки') }}" class="btn btn-secondary">Брюки</a>
+        <a href="{{ url_for('catalog', category='Джинсы') }}" class="btn btn-secondary">Джинсы</a>
+        <a href="{{ url_for('catalog', category='Купальники') }}" class="btn btn-secondary">Купальники</a>
+        <a href="{{ url_for('catalog', category='Куртки') }}" class="btn btn-secondary">Куртки</a>
+        <a href="{{ url_for('catalog', category='Пижамы') }}" class="btn btn-secondary">Пижамы</a>
+        <a href="{{ url_for('catalog', category='Платья') }}" class="btn btn-secondary">Платья</a>
+        <a href="{{ url_for('catalog', category='Толстовки') }}" class="btn btn-secondary">Толстовки</a>
+        <a href="{{ url_for('catalog', category='Футболки') }}" class="btn btn-secondary">Футболки</a>
+        <a href="{{ url_for('catalog', category='Шорты') }}" class="btn btn-secondary">Шорты</a>
+        <a href="{{ url_for('catalog', category='Юбки') }}" class="btn btn-secondary">Юбки</a>
+
+    </div>
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" id="searchInput" placeholder="Поиск по названию товара...">
+        <button class="btn btn-outline-secondary" type="button" id="searchButton">Поиск</button>
+    </div>
+    <div class="row row-cols-1 row-cols-md-4 g-4" id="productContainer">
+        {% for product in products %}
+        <div class="col product-card">
+            <div class="card h-100">
+                <img src="{{ product.image }}" class="card-img-top" alt="Данный товар потерял изображение">
+
+
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <form action="/item/{{ product.id }}" method="POST">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">Подробнее</button>
+                    </form>
+                    <form action="/add_to_cart/{{ product.id }}" method="POST">
+                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                        {% if session['data'] and session['data'].roll == 'user' %}
+                        <p class="card-text">Выберите размер:</p>
+
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="size" id="size_s" value="S" required>
+                            <label class="form-check-label" for="size_s">S</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="size" id="size_m" value="M" required>
+                            <label class="form-check-label" for="size_m">M</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="size" id="size_l" value="L" required>
+                            <label class="form-check-label" for="size_l">L</label>
+                        </div>
+                        {% elif not session['data'] %}
+                        <p class="card-text">Возможные размеры:</p>
+                        <div class="form-check form-check-inline">
+
+                            <label class="form-check-label" for="size_s">S</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label" for="size_m">M</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+
+                            <label class="form-check-label" for="size_l">L</label>
+                        </div>
+                        {% endif %}
+                        <p class="card-text">Цена: ${{ product.price }}</p>
+                        {% if session['data'] and session['data'].roll == 'user' %}
+                        <form action="/add_to_cart/{{ product.id }}" method="POST">
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <form action="/add_to_cart/{{ product.id }}" method="POST">
+                                <button type="submit" class="btn btn-sm btn-outline-secondary">Добавить в корзину
+                                </button>
+                            </form>
+                        </form>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      let searchInput = document.getElementById('searchInput');
+      let productContainer = document.getElementById('productContainer');
+      let productCards = productContainer.querySelectorAll('.product-card');
+
+      function applySearchFilter(searchQuery) {
+        let matchedCards = [];
+
+        productCards.forEach(function (card) {
+          let productName = card.querySelector('.card-title').innerText.trim().toLowerCase();
+          if (productName.includes(searchQuery)) {
+            matchedCards.push(card);
+            card.style.display = 'none';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        matchedCards.forEach(function (card) {
+          productContainer.prepend(card);
+          card.style.display = 'block';
+        });
+      }
+
+      document.getElementById('searchButton').addEventListener('click', function () {
+        let searchQuery = searchInput.value.trim().toLowerCase();
+        applySearchFilter(searchQuery);
+      });
+
+      searchInput.addEventListener('input', function () {
+        let searchQuery = searchInput.value.trim().toLowerCase();
+        applySearchFilter(searchQuery);
+      });
+    });
+</script>
+{% endblock %}

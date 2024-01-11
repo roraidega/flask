@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container my-5">
+    {% if session['data'].roll == 'user' %}
+    <h2 class="mb-4">Корзина пользователя</h2>
+    {% else %}
+    <h2 class="mb-4">Активные товары</h2>
+    {% endif %}
+
+
+    {% if products %}
+    <div class="row">
+        {% for product, size in products %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <img src="{{ product.image }}" class="card-img-top" alt="{{ product.name }} Image">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">Размер: {{ size }}</p>
+                    <p class="card-text">Цена: ${{ product.price }}</p>
+                    <form action="/remove_from_cart/{{ product.id }}" method="POST">
+                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                        <button type="submit" class="btn btn-sm btn-danger">Убрать из корзины</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="text-end">
+        <h4>Итоговая сумма: ${{ total_price }}</h4>
+        <a href="/buy"
+           class="btn btn-sm btn-danger">Оформить заказ</a>
+    </div>
+
+    {% elif seller_products %}
+    <div class="row">
+        {% for product in seller_products %}
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <img src="{{ product.image }}" class="card-img-top" alt="{{ product.name }} Image">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">Цена: ${{ product.price }}</p>
+                    <form action="/remove_product/{{ product.id }}" method="POST">
+                        <input type="hidden" name="product_id" value="{{ product.id }}">
+                        <button type="submit" class="btn btn-sm btn-danger">Удалить товар</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="text-end">
+            <a href="/test"
+               class="btn btn-sm btn-danger">Добавить товары</a>
+        </div>
+    </div>
+
+
+    {% else %}
+    {% if session['data'].roll != 'user' %}
+    <p class="lead">У вас отсутствуют активные товары <a href="{{ url_for('test') }}">Перейти к добавлению</a></p>
+    {% else %}
+    <p class="lead">Ваша корзина пуста. <a href="{{ url_for('catalog') }}">Перейти к покупкам</a></p>
+    {% endif %}
+    {% endif %}
+</div>
+
+{% endblock %}

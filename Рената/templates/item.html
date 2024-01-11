@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid py-5">
+    <div class="row">
+        <div class="col-md-6">
+            <h1 class="display-5 fw-bold">{{ item.name }}</h1>
+            <p class="col-md-8 fs-4">Цена: ${{ item.price }}</p>
+            <div class="product-details">
+                <img src="{{ url_for('static', filename=item.image) }}" alt="Описание изображения"
+                     class="product-image">
+                <form action="/add_to_cart/{{ product_id }}" method="POST" class="add-to-cart-form">
+                    <input type="hidden" name="product_id" value="{{ item.id }}">
+
+                    {% if session['data'] and session['data'].roll == 'user' %}
+                        <p class="card-text">Выберите размер:</p>
+
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="size" id="size_s" value="S" required>
+                            <label class="form-check-label" for="size_s">S</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="size" id="size_m" value="M" required>
+                            <label class="form-check-label" for="size_m">M</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="size" id="size_l" value="L" required>
+                            <label class="form-check-label" for="size_l">L</label>
+                        </div>
+                        {% else %}
+                        <p class="card-text">Возможные размеры:</p>
+                        <div class="form-check form-check-inline">
+
+                            <label class="form-check-label" for="size_s">S</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label" for="size_m">M</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+
+                            <label class="form-check-label" for="size_l">L</label>
+                        </div>
+                        {% endif %}
+
+                        {% if session['data'] and session['data'].roll == 'user' %}
+
+                    <input type="submit" class="btn btn-primary" value="Добавить в корзину">
+                    {% endif %}
+                </form>
+                <a href="{{ url_for('catalog') }}" class="btn btn-secondary mt-3">Вернуться в каталог</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
